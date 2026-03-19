@@ -8,7 +8,8 @@ const Submissions: React.FC = () => {
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const correctCode = "0000";
+  const correctCode = import.meta.env.VITE_ADMIN_ACCESS_CODE;
+
 
   useEffect(() => {
     if (isAuthorized) {
