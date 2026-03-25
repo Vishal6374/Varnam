@@ -127,12 +127,21 @@ const SriShannugha: React.FC = () => {
         
         {/* Navigation */}
         <header className="flex justify-between items-center py-6 relative">
-          <div className="md:hidden z-50">
-            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2">
-              {isMenuOpen ? <X size={32} /> : <Menu size={32} />}
-            </button>
+          {/* Left: hamburger (mobile) / logo (desktop) */}
+          <div className="flex items-center gap-3">
+            <div className="md:hidden z-50">
+              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2">
+                {isMenuOpen ? <X size={32} /> : <Menu size={32} />}
+              </button>
+            </div>
+            {/* Desktop: SSEI logo on the left */}
+            <div className="hidden md:flex items-center gap-2">
+              <img className="w-10 h-10 object-contain" alt="SSEI" src={SSEILogo2} />
+              <span className="font-sans font-bold text-sm text-white/80 leading-tight">Sri Shanmugha<br/>College of Engineering</span>
+            </div>
           </div>
 
+          {/* Center: Nav links */}
           <nav className={`fixed inset-0 bg-black/90 z-40 flex flex-col items-center justify-center gap-8 text-2xl transition-transform duration-300 md:relative md:bg-transparent md:flex-row md:inset-auto md:text-base md:gap-[54px] md:translate-x-0 ${isMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
             {navItems.map((item) => (
               <a
@@ -146,17 +155,25 @@ const SriShannugha: React.FC = () => {
             ))}
           </nav>
 
+          {/* Right: Varnam × Aura tag (desktop only) */}
+          <div className="hidden md:flex items-center gap-2 text-right">
+            <div className="font-melodrama italic text-sm text-white/70 leading-tight">
+              <span className="text-orange-400 text-base">Varnam</span> <span className="text-white/50">×</span> <span className="text-yellow-400 text-base">Aura</span><br/>
+              <span className="text-xs font-sans font-light tracking-widest text-white/40">MARCH 27, 2026</span>
+            </div>
+          </div>
+
           {/* Background for Desktop Nav Pills */}
-          <div className="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[409px] h-[42px] bg-[#d9d9d933] rounded-[7px] backdrop-blur-[19.0px] shadow-[inset_0_1px_0_rgba(255,255,255,0.40),inset_1px_0_0_rgba(255,255,255,0.32)] -z-1" />
+          <div className="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[409px] h-[42px] bg-[#d9d9d933] rounded-[7px] backdrop-blur-[19.0px] shadow-[inset_0_1px_0_rgba(255,255,255,0.40),inset_1px_0_0_rgba(255,255,255,0.32)] -z-10" />
         </header>
 
-        {/* Hero Image (Mobile/Tablet Friendly) */}
-        <div className="absolute right-0 top-20 opacity-20 md:opacity-100 pointer-events-none overflow-hidden">
-             <img
-              className="w-[300px] md:w-[586px] h-auto mix-blend-multiply"
-              alt=""
-              src={dsc06605Copy1}
-            />
+        {/* Hero Image — top-right decorative image, visible on all screens */}
+        <div className="absolute right-0 top-16 pointer-events-none overflow-hidden z-0">
+          <img
+            className="w-[180px] sm:w-[300px] md:w-[520px] lg:w-[586px] h-auto opacity-30 sm:opacity-60 md:opacity-90 mix-blend-screen"
+            alt=""
+            src={dsc06605Copy1}
+          />
         </div>
 
         {/* Hero Content */}
@@ -317,10 +334,13 @@ const SriShannugha: React.FC = () => {
         </section>
 
         {/* Bottom Marquee */}
-        <div className="mt-32 w-screen left-1/2 -translate-x-1/2 overflow-hidden opacity-40">
-           <div className="flex w-fit whitespace-nowrap animate-marquee gap-12">
-            {Array(10).fill("Celebrate Every Colour | ").map((text, i) => (
-              <span key={i} className="font-melodrama text-white text-3xl italic">{text}</span>
+        <div className="relative mt-32 w-screen left-1/2 -translate-x-1/2 overflow-hidden opacity-40">
+          <div
+            className="flex whitespace-nowrap animate-marquee gap-12"
+            style={{ '--duration': '30s' } as React.CSSProperties}
+          >
+            {Array(20).fill("Celebrate Every Colour  ✦  ").map((text, i) => (
+              <span key={i} className="font-melodrama text-white text-3xl italic flex-shrink-0">{text}</span>
             ))}
           </div>
         </div>
