@@ -35,6 +35,8 @@ const SriShannugha: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+
   const [formData, setFormData] = useState({
     fullName: "",
     sinNumber: "",
@@ -58,18 +60,67 @@ const SriShannugha: React.FC = () => {
     });
   };
 
+  const validate = (): Record<string, string> => {
+    const errors: Record<string, string> = {};
+
+    if (!formData.fullName.trim()) {
+      errors.fullName = "Full name is required.";
+    } else if (!/^[a-zA-Z\s.'-]+$/.test(formData.fullName.trim())) {
+      errors.fullName = "Full name can only contain letters, spaces, and basic punctuation.";
+    }
+
+    if (!formData.sinNumber.trim()) {
+      errors.sinNumber = "SIN number is required.";
+    } else if (!/^[a-zA-Z0-9]+$/.test(formData.sinNumber.trim())) {
+      errors.sinNumber = "SIN number must be alphanumeric (no spaces or special characters).";
+    }
+
+    if (!formData.department.trim()) {
+      errors.department = "Department is required.";
+    }
+
+    if (!formData.yearOfStudy.trim()) {
+      errors.yearOfStudy = "Year of study is required.";
+    } else if (!/^[1-4]$/.test(formData.yearOfStudy.trim())) {
+      errors.yearOfStudy = "Year of study must be a single digit between 1 and 4.";
+    }
+
+    if (!formData.mobileNumber.trim()) {
+      errors.mobileNumber = "Mobile number is required.";
+    } else if (!/^[6-9]\d{9}$/.test(formData.mobileNumber.trim())) {
+      errors.mobileNumber = "Enter a valid 10-digit Indian mobile number.";
+    }
+
+    if (!formData.emailAddress.trim()) {
+      errors.emailAddress = "Email address is required.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.emailAddress.trim())) {
+      errors.emailAddress = "Enter a valid email address.";
+    }
+
+    if (formData.registerFor.length === 0) {
+      errors.registerFor = "Please select at least one event to register for.";
+    }
+
+    return errors;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setRegistering(true);
     setError(null);
     setSuccess(false);
 
+    const errors = validate();
+    setFormErrors(errors);
+    if (Object.keys(errors).length > 0) return;
+
+    setRegistering(true);
     try {
       await addDoc(collection(db, "registrations"), {
         ...formData,
         submittedAt: serverTimestamp(),
       });
       setSuccess(true);
+      setFormErrors({});
       // Reset form
       setFormData({
         fullName: "",
@@ -122,6 +173,15 @@ const SriShannugha: React.FC = () => {
         />
       </div>
 
+      {/* Hero Image — absolute to root div so it reaches the right viewport edge */}
+      <div className="absolute right-0 top-0 pointer-events-none z-[5] overflow-hidden">
+        <img
+          className="w-[180px] sm:w-[300px] md:w-[520px] lg:w-[600px] h-auto opacity-30 sm:opacity-50 md:opacity-85 mix-blend-screen"
+          alt=""
+          src={dsc06605Copy1}
+        />
+      </div>
+
       {/* ── LAYER 3: Main Content ── */}
       <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-20">
         
@@ -142,7 +202,7 @@ const SriShannugha: React.FC = () => {
           </div>
 
           {/* Center: Nav links */}
-          <nav className={`fixed inset-0 bg-black/90 z-40 flex flex-col items-center justify-center gap-8 text-2xl transition-transform duration-300 md:relative md:bg-transparent md:flex-row md:inset-auto md:text-base md:gap-[54px] md:translate-x-0 ${isMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
+          <nav className={`fixed inset-0 bg-black/90 z-40 flex flex-col items-center justify-center gap-8 text-2xl transition-transform duration-300 md:relative md:bg-transparent md:flex-row md:inset-auto md:text-base md:gap-[40px] md:translate-x-0 ${isMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
             {navItems.map((item) => (
               <a
                 key={item}
@@ -164,17 +224,10 @@ const SriShannugha: React.FC = () => {
           </div>
 
           {/* Background for Desktop Nav Pills */}
-          <div className="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[409px] h-[42px] bg-[#d9d9d933] rounded-[7px] backdrop-blur-[19.0px] shadow-[inset_0_1px_0_rgba(255,255,255,0.40),inset_1px_0_0_rgba(255,255,255,0.32)] -z-10" />
+          <div className="hidden md:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[42px] bg-[#d9d9d933] rounded-[7px] backdrop-blur-[19.0px] shadow-[inset_0_1px_0_rgba(255,255,255,0.40),inset_1px_0_0_rgba(255,255,255,0.32)] -z-10" />
         </header>
 
-        {/* Hero Image — top-right decorative image, visible on all screens */}
-        <div className="absolute right-0 top-16 pointer-events-none overflow-hidden z-0">
-          <img
-            className="w-[180px] sm:w-[300px] md:w-[520px] lg:w-[586px] h-auto opacity-30 sm:opacity-60 md:opacity-90 mix-blend-screen"
-            alt=""
-            src={dsc06605Copy1}
-          />
-        </div>
+
 
         {/* Hero Content */}
         <div className="flex flex-col items-center mt-12 md:mt-24 text-center ">
@@ -253,31 +306,46 @@ const SriShannugha: React.FC = () => {
               {/* Personal Info Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 lg:gap-x-24 gap-y-8">
                 {[
-                  { label: "Full Name", key: "fullName" },
-                  { label: "Sin Number", key: "sinNumber" },
-                  { label: "Department", key: "department" },
-                  { label: "Year of Study", key: "yearOfStudy" },
-                  { label: "Mobile Number", key: "mobileNumber" },
-                  { label: "Email Address", key: "emailAddress" },
+                  { label: "Full Name", key: "fullName", type: "text" },
+                  { label: "Sin Number", key: "sinNumber", type: "text" },
+                  { label: "Department", key: "department", type: "text" },
+                  { label: "Year of Study", key: "yearOfStudy", type: "text", placeholder: "1, 2, 3 or 4" },
+                  { label: "Mobile Number", key: "mobileNumber", type: "tel" },
+                  { label: "Email Address", key: "emailAddress", type: "email" },
                 ].map((field) => (
-                  <div key={field.key} className="flex flex-col gap-2">
+                  <div key={field.key} className="flex flex-col gap-1">
                     <label className="font-sans font-normal text-white text-base">
-                      {field.label}
+                      {field.label} <span className="text-orange-400">*</span>
                     </label>
                     <input
-                      type="text"
-                      className="w-full h-12 bg-white/10 rounded-xl px-4 font-sans text-white text-sm border border-white/10 focus:border-orange-400 focus:ring-1 focus:ring-orange-400 outline-none transition-all placeholder:text-white/30"
-                      placeholder={`Enter your ${field.label.toLowerCase()}`}
+                      type={field.type}
+                      className={`w-full h-12 bg-white/10 rounded-xl px-4 font-sans text-white text-sm border outline-none transition-all placeholder:text-white/30 ${
+                        formErrors[field.key]
+                          ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500"
+                          : "border-white/10 focus:border-orange-400 focus:ring-1 focus:ring-orange-400"
+                      }`}
+                      placeholder={field.placeholder ?? `Enter your ${field.label.toLowerCase()}`}
                       value={formData[field.key as keyof typeof formData] as string}
-                      onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
+                      onChange={(e) => {
+                        setFormData({ ...formData, [field.key]: e.target.value });
+                        if (formErrors[field.key]) setFormErrors((prev) => ({ ...prev, [field.key]: "" }));
+                      }}
                     />
+                    {formErrors[field.key] && (
+                      <p className="text-red-400 text-xs mt-0.5">{formErrors[field.key]}</p>
+                    )}
                   </div>
                 ))}
               </div>
 
               {/* Register For Section */}
-              <div className="flex flex-col items-center gap-8">
-                <div className="font-sans font-medium text-2xl text-white">Register For</div>
+              <div className="flex flex-col items-center gap-4">
+                <div className="font-sans font-medium text-2xl text-white">
+                  Register For <span className="text-orange-400">*</span>
+                </div>
+                {formErrors.registerFor && (
+                  <p className="text-red-400 text-sm">{formErrors.registerFor}</p>
+                )}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
                   {[
                     "Singing", "Group Dance", "Miming", "Drama",
